@@ -85,13 +85,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-       // builder.Services.AddCors(options =>
-       // {
-       //     options.AddDefaultPolicy(policy =>
-       //     {
-       //         policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
-       // });
-       // });
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+        });
+        });
 
         builder.Services.AddDbContext<KasisDbContext>();
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -124,7 +124,7 @@ public class Program
 
         var app = builder.Build();
         using var scope = app.Services.CreateScope();
-        //app.UseCors();
+        app.UseCors();
         var dbContext = scope.ServiceProvider.GetRequiredService<KasisDbContext>();
         dbContext.Database.Migrate();
 
