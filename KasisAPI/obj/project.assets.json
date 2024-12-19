@@ -2896,11 +2896,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\airid\\OneDrive\\Stalinis kompiuteris\\KasisAPI\\KasisAPI\\KasisAPI.csproj",
+      "projectUniqueName": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj",
       "projectName": "KasisAPI",
-      "projectPath": "C:\\Users\\airid\\OneDrive\\Stalinis kompiuteris\\KasisAPI\\KasisAPI\\KasisAPI.csproj",
+      "projectPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj",
       "packagesPath": "C:\\Users\\airid\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\airid\\OneDrive\\Stalinis kompiuteris\\KasisAPI\\KasisAPI\\obj\\",
+      "outputPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\airid\\AppData\\Roaming\\NuGet\\NuGet.Config",

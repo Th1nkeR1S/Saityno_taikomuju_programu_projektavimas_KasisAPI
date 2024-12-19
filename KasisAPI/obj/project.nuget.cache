@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tbsLQo7nLrg=",
+  "dgSpecHash": "cmzxnGVJ+fI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\airid\\OneDrive\\Stalinis kompiuteris\\KasisAPI\\KasisAPI\\KasisAPI.csproj",
+  "projectFilePath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\airid\\.nuget\\packages\\fluentvalidation\\11.5.1\\fluentvalidation.11.5.1.nupkg.sha512",
     "C:\\Users\\airid\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.0\\fluentvalidation.aspnetcore.11.3.0.nupkg.sha512",
