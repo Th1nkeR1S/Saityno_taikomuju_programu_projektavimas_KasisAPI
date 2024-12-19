@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj": {}
+    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj": {
+    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj",
+        "projectUniqueName": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
         "projectName": "KasisAPI",
-        "projectPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\KasisAPI.csproj",
+        "projectPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
         "packagesPath": "C:\\Users\\airid\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI\\obj\\",
+        "outputPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\airid\\AppData\\Roaming\\NuGet\\NuGet.Config",
