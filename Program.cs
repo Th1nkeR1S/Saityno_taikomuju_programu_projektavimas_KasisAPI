@@ -95,12 +95,12 @@ public class Program
         builder.Services.AddTransient<SessionService>();
         
     builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", builder =>
-        builder.WithOrigins("http://localhost:3000") // Allow requests from the React app
-               .AllowAnyHeader()
-               .AllowAnyMethod());
-});
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins("http://localhost:3000","https://localhost:5300").AllowAnyHeader().AllowAnyMethod();
+            });
+        });
 
         builder.Services.AddIdentity<ForumUser, IdentityRole>()
             .AddEntityFrameworkStores<KasisDbContext>()
@@ -122,6 +122,7 @@ public class Program
         builder.Services.AddAuthorization();
 
         var app = builder.Build();
+        app.UseCors();
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<KasisDbContext>();
         dbContext.Database.Migrate();
@@ -132,11 +133,11 @@ public class Program
         app.AddAuthApi();
         app.MapGet("api",(HttpContext httpContext, LinkGenerator linkGenerator)=> Results.Ok(new List<LinkDto>
         {
-            new(linkGenerator.GetUriByName(httpContext, "GetTopics"), "movies", "GET"),
-        new(linkGenerator.GetUriByName(httpContext, "CreateTopics"), "createMovie", "POST"),
+            new(linkGenerator.GetUriByName(httpContext, "GetTopics"), "Topics", "GET"),
+        new(linkGenerator.GetUriByName(httpContext, "CreateTopics"), "createTopic", "POST"),
         new(linkGenerator.GetUriByName(httpContext, "GetRoot"), "self", "GET"),
         })).WithName("GetRoot");
-        app.UseCors("AllowFrontend");
+        
         app.AddTopicsApi();
         app.AddPostsApi();
         app.AddCommentsApi();
