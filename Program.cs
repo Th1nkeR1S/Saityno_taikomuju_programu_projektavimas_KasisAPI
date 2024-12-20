@@ -116,10 +116,10 @@ public class Program
         var app = builder.Build();
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<KasisDbContext>();
-        dbContext.Database.Migrate();
+       // dbContext.Database.Migrate();
 
         var dbSeeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
-        await dbSeeder.SeedAsync();   
+       // await dbSeeder.SeedAsync();   
 
         app.AddAuthApi();
         app.MapGet("api",(HttpContext httpContext, LinkGenerator linkGenerator)=> Results.Ok(new List<LinkDto>
