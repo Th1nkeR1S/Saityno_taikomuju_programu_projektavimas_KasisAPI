@@ -126,7 +126,7 @@ public class Program
         using var scope = app.Services.CreateScope();
         app.UseCors();
         var dbContext = scope.ServiceProvider.GetRequiredService<KasisDbContext>();
-        dbContext.Database.Migrate();
+       // dbContext.Database.Migrate();
 
         var dbSeeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
             await dbSeeder.SeedAsync();   
