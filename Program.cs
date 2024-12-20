@@ -94,15 +94,14 @@ public class Program
         builder.Services.AddTransient<JwtTokenService>();
         builder.Services.AddTransient<SessionService>();
         
-       builder.Services.AddCors(options =>
+    builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Allow React development server
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.AddPolicy("AllowFrontend", builder =>
+        builder.WithOrigins("http://localhost:3000") // Allow requests from the React app
+               .AllowAnyHeader()
+               .AllowAnyMethod());
 });
+
         builder.Services.AddIdentity<ForumUser, IdentityRole>()
             .AddEntityFrameworkStores<KasisDbContext>()
             .AddDefaultTokenProviders();
@@ -137,7 +136,7 @@ public class Program
         new(linkGenerator.GetUriByName(httpContext, "CreateTopics"), "createMovie", "POST"),
         new(linkGenerator.GetUriByName(httpContext, "GetRoot"), "self", "GET"),
         })).WithName("GetRoot");
-        app.UseCors();
+        app.UseCors("AllowFrontend");
         app.AddTopicsApi();
         app.AddPostsApi();
         app.AddCommentsApi();
