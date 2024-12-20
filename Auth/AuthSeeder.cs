@@ -13,12 +13,11 @@ public class AuthSeeder
         _userManager = userManager;
         _roleManager = roleManager;
     }
-
+    
     public async Task SeedAsync()
     {
         await AddDefaultRolesAsync();
         await AddAdminUserAsync();
-
     }
 
     private async Task AddAdminUserAsync()
@@ -46,10 +45,7 @@ public class AuthSeeder
         {
             var roleExists = await _roleManager.RoleExistsAsync(role);
             if (!roleExists)
-            {
                 await _roleManager.CreateAsync(new IdentityRole(role));
-            }
         }
     }
 }
-

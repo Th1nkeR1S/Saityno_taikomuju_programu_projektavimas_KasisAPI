@@ -47,7 +47,6 @@ public class JwtTokenService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, userId),
             new("SessionId", sessionId.ToString())
-
         };
 
         var token = new JwtSecurityToken
@@ -61,27 +60,25 @@ public class JwtTokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
     public bool TryParseRefreshToken(string refreshToken, out ClaimsPrincipal? claims)
     {
         try
         {
-            var tokenHandler = new JwtSecurityTokenHandler(){MapInboundClaims = false};
+            var tokenHandler = new JwtSecurityTokenHandler() { MapInboundClaims = false };
             var validationParameters = new TokenValidationParameters()
             {
                 ValidIssuer = _issuer,
                 ValidAudience = _audience,
                 IssuerSigningKey = _authSigningKey,
                 ValidateLifetime = true
-                
-
             };
             
             claims = tokenHandler.ValidateToken(refreshToken, validationParameters, out _);
             return true;
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine(ex.Message);
             claims = null;
             return false;
         }

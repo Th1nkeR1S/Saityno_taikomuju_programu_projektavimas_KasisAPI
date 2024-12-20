@@ -1,0 +1,6 @@
+@KasisAPI_HotAddress = http://localhost:5300
+
+GET{{KasisAPI_HotAddress}}/weatherforecast/
+Accept:application/json
+
+##

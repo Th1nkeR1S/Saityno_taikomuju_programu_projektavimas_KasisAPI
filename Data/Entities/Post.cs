@@ -27,6 +27,6 @@ public class Post
 
     public PostDto ToDto()
     {
-        return new PostDto(this.Topic.Id, Id, Title, Body, CreatedAt);
+        return new PostDto(this.Topic?.Id ?? 0, Id, Title, Body, CreatedAt);
     }
 }

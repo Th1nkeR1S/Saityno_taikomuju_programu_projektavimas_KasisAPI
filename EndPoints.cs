@@ -5,17 +5,33 @@ using KasisAPI.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
-using KasisAPI.Helpers;
-using System.Security.Claims;
 using KasisAPI.Auth.Model;
-using KasisAPI.Auth;
-using System.IdentityModel.Tokens.Jwt;
 using KasisAPI;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+
+
 
 public static class Endpoints
 {
+
+    public static void AddTestApi(this WebApplication app)
+{
+    app.MapGet("/api/test", async (KasisDbContext dbContext) =>
+    {
+        try
+        {
+            var topics = await dbContext.Topics.ToListAsync();
+            return Results.Ok(topics);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem("Database connection failed: " + ex.Message);
+        }
+    });
+}
     public static void AddTopicsApi(this WebApplication app)
     {
         var topicsGroups = app.MapGroup("/api").AddFluentValidationAutoValidation();
@@ -26,19 +42,15 @@ public static class Endpoints
             return topics.Select(topic => topic.ToDto());
         });
 
-        topicsGroups.MapPost("/topics",[Authorize(Roles = ForumRoles.Admin)] async (CreateOrUpdateTopicDto dto, KasisDbContext dbContext, HttpContext httpContext) =>
-        {
-            var topic = new Topic { 
-                Title = dto.Title,
-                Description = dto.Description,
-                CreatedAt = DateTimeOffset.UtcNow,
-                UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
-            };
-            dbContext.Topics.Add(topic);
-            await dbContext.SaveChangesAsync();
+        topicsGroups.MapPost("/topics", [Authorize(Roles = ForumRoles.ForumUser)] async (CreateOrUpdateTopicDto dto, KasisDbContext dbContext,LinkGenerator linkGenerator, HttpContext httpContext) =>
+       {
+           var topic = new Topic { Title = dto.Title, Description = dto.Description, CreatedAt = DateTimeOffset.UtcNow,
+              UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)};
+           dbContext.Topics.Add(topic);
+           await dbContext.SaveChangesAsync();
 
-            return Results.Created($"api/topics/{topic.Id}", topic.ToDto());
-        });
+           return Results.Created($"api/topics/{topic.Id}", topic.ToDto());
+       });
 
         topicsGroups.MapGet("/topics/{topicId}", async (int topicId, KasisDbContext dbContext) =>
         {
@@ -51,7 +63,7 @@ public static class Endpoints
             return Results.Ok(topic.ToDto());
         });
 
-        topicsGroups.MapPut("/topics/{topicId}",[Authorize(Roles = ForumRoles.Admin)] async (CreateOrUpdateTopicDto dto, int topicId,HttpContext httpContext, KasisDbContext dbContext) =>
+        topicsGroups.MapPut("/topics/{topicId}", [Authorize] async (CreateOrUpdateTopicDto dto, int topicId, HttpContext httpContext, KasisDbContext dbContext) =>
         {
             var topic = await dbContext.Topics.FindAsync(topicId);
             if (topic == null)
@@ -62,10 +74,11 @@ public static class Endpoints
             if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
             httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != topic.UserId)
             {
+            // NotFound()
             return Results.Forbid();
             }
 
-            topic.Title = dto.Description;
+            topic.Title = dto.Title;
             topic.Description = dto.Description;
             dbContext.Topics.Update(topic);
             await dbContext.SaveChangesAsync();
@@ -73,18 +86,12 @@ public static class Endpoints
             return Results.Ok(topic.ToDto());
         });
 
-        topicsGroups.MapDelete("/topics/{topicId}",[Authorize(Roles = ForumRoles.Admin)] async (int topicId,HttpContext httpContext, KasisDbContext dbContext) =>
+        topicsGroups.MapDelete("/topics/{topicId}", async (int topicId, KasisDbContext dbContext) =>
         {
             var topic = await dbContext.Topics.FindAsync(topicId);
             if (topic == null)
             {
                 return Results.NotFound();
-            }
-
-            if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
-            httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != topic.UserId)
-            {
-            return Results.Forbid();
             }
 
             dbContext.Topics.Remove(topic);
@@ -110,26 +117,23 @@ public static class Endpoints
             return Results.Ok(posts.Select(post => post.ToDto()));
         });
 
-        postsGroups.MapPost("/posts",[Authorize(Roles = ForumRoles.ForumUser + "," + ForumRoles.Admin)] async (int topicId, CreateOrUpdatePostDto dto, KasisDbContext dbContext,HttpContext httpContext) =>
-        {
-            var topic = await dbContext.Topics.FindAsync(topicId);
-            if (topic == null)
-            {
-                return Results.NotFound();
-            }
+        
+postsGroups.MapPost("/posts", async (int topicId, CreateOrUpdatePostDto dto, KasisDbContext dbContext, HttpContext httpContext) =>
+{
+    var topic = await dbContext.Topics.FindAsync(topicId);
+    if (topic == null)
+    {
+        return Results.NotFound();
+    }
 
-            var post = new Post {
-                Title = dto.Title,
-                Body = dto.Body,
-                CreatedAt = DateTimeOffset.UtcNow,
-                Topic = topic,
-                UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
-            };
-            dbContext.Posts.Add(post);
-            await dbContext.SaveChangesAsync();
+    var userId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub); // Get UserId from the JWT
+    var post = new Post { Title = dto.Title, Body = dto.Body, CreatedAt = DateTimeOffset.UtcNow, Topic = topic, UserId = userId };
 
-            return Results.Created($"/api/topics/{topicId}/posts/{post.Id}", post.ToDto());
-        });
+    dbContext.Posts.Add(post);
+    await dbContext.SaveChangesAsync();
+
+    return Results.Created($"/api/topics/{topicId}/posts/{post.Id}", post.ToDto());
+});
 
         postsGroups.MapGet("/posts/{postId}", async (int topicId, int postId, KasisDbContext dbContext) =>
         {
@@ -143,19 +147,13 @@ public static class Endpoints
             return Results.Ok(post.ToDto());
         });
 
-        postsGroups.MapPut("/posts/{postId}",[Authorize] async (int topicId, int postId, CreateOrUpdatePostDto dto,HttpContext httpContext, KasisDbContext dbContext) =>
+        postsGroups.MapPut("/posts/{postId}", async (int topicId, int postId, CreateOrUpdatePostDto dto, KasisDbContext dbContext) =>
         {
             var posts = dbContext.Posts.Include(post => post.Topic);
             var post = await posts.FirstOrDefaultAsync(post => post.Id == postId && post.Topic.Id == topicId);
             if (post == null)
             {
                 return Results.NotFound();
-            }
-
-            if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
-                httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != post.UserId)
-            {
-                return Results.Forbid();
             }
 
             post.Title = dto.Title;
@@ -166,7 +164,7 @@ public static class Endpoints
             return Results.Ok(post.ToDto());
         });
 
-        postsGroups.MapDelete("/posts/{postId}",[Authorize] async (int topicId, int postId,HttpContext httpContext, KasisDbContext dbContext) =>
+        postsGroups.MapDelete("/posts/{postId}", async (int topicId, int postId, KasisDbContext dbContext) =>
         {
             var posts = dbContext.Posts.Include(post => post.Topic);
             var post = await posts.FirstOrDefaultAsync(post => post.Id == postId && post.Topic.Id == topicId);
@@ -175,120 +173,127 @@ public static class Endpoints
                 return Results.NotFound();
             }
 
-            if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
-                httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != post.UserId)
-            {
-                return Results.Forbid();
-            }
-
             dbContext.Posts.Remove(post);
             await dbContext.SaveChangesAsync();
 
             return Results.NoContent();
         });
     }
-    
+
     public static void AddCommentsApi(this WebApplication app)
+{
+    var commentsGroups = app.MapGroup("/api/topics/{topicId}/posts/{postId}").AddFluentValidationAutoValidation();
+
+    // Get comments for a post
+    commentsGroups.MapGet("/comments", async (int topicId, int postId, KasisDbContext dbContext) =>
     {
-        var commentsGroups = app.MapGroup("/api/topics/{topicId}/posts/{postId}").AddFluentValidationAutoValidation();
+        var post = await dbContext.Posts.Include(p => p.Topic).FirstOrDefaultAsync(p => p.Id == postId && p.Topic.Id == topicId);
 
-        commentsGroups.MapGet("/comments", async (int topicId, int postId, KasisDbContext dbContext) =>
+        if (post == null)
         {
-            var posts = dbContext.Posts.Include(post => post.Topic);
-            var post = await posts.FirstOrDefaultAsync(post => post.Id == postId && post.Topic.Id == topicId);
+            return Results.NotFound();
+        }
 
-            if (post == null || post.Topic.Id != topicId)
-            {
-                return Results.NotFound();
-            }
+        var comments = await dbContext.Comments.Where(c => c.Post.Id == postId).ToListAsync();
+        return Results.Ok(comments.Select(comment => comment.ToDto()));
+    });
 
-            var comments = await dbContext.Comments.Where(comment => comment.Post.Id == postId).ToListAsync();
-            return Results.Ok(comments.Select(comment => comment.ToDto()));
-        });
-
-        commentsGroups.MapPost("/comments", async (int topicId, int postId, CreateOrUpdateCommentDto dto, KasisDbContext dbContext, HttpContext httpContext) =>
+    // Create a new comment on a post
+    commentsGroups.MapPost("/comments", async (int topicId, int postId, CreateOrUpdateCommentDto dto, KasisDbContext dbContext, HttpContext httpContext) =>
+    {
+        // Find the post associated with the topic
+        var post = await dbContext.Posts.Include(p => p.Topic).FirstOrDefaultAsync(p => p.Id == postId && p.Topic.Id == topicId);
+        if (post == null)
         {
-            var posts = dbContext.Posts.Include(post => post.Topic);
-            var post = await posts.FirstOrDefaultAsync(post => post.Id == postId && post.Topic.Id == topicId);
+            return Results.NotFound(); // Post not found for the given topicId
+        }
 
-            if (post == null || post.Topic.Id != topicId)
-            {
-                return Results.NotFound();
-            }
+        // Getting UserId from JWT (User is logged in)
+        var userId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
-            var comment = new Comment
-            {
-                Content = dto.Content,
-                CreatedAt = DateTimeOffset.UtcNow,
-                Post = post,
-                UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
-            };
-
-            dbContext.Comments.Add(comment);
-            await dbContext.SaveChangesAsync();
-
-            return Results.Created($"/api/topics/{topicId}/posts/{postId}/comments/{comment.Id}", comment.ToDto());
-        });
-
-        commentsGroups.MapGet("/comments/{commentId}", async (int topicId, int postId, int commentId, KasisDbContext dbContext) =>
+        // Create and save the comment
+        var comment = new Comment
         {
-            var comment = await dbContext.Comments
-                .Include(comment => comment.Post)
-                .FirstOrDefaultAsync(comment => comment.Id == commentId && comment.Post.Id == postId && comment.Post.Topic.Id == topicId);
+            Content = dto.Content,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UserId = userId, // Assign the logged-in user's ID to the comment
+            Post = post // Associate the comment with the correct post
+        };
 
-            if (comment == null)
-            {
-                return Results.NotFound();
-            }
+        dbContext.Comments.Add(comment);
+        await dbContext.SaveChangesAsync();
 
-            return Results.Ok(comment.ToDto());
-        });
+        // Return the created comment with its DTO representation
+        return Results.Created($"/api/topics/{topicId}/posts/{postId}/comments/{comment.Id}", comment.ToDto());
+    });
 
-        commentsGroups.MapPut("/comments/{commentId}",[Authorize] async (int topicId, int postId, int commentId, CreateOrUpdateCommentDto dto, HttpContext httpContext, KasisDbContext dbContext) =>
+    // Get a specific comment by ID
+    commentsGroups.MapGet("/comments/{commentId}", async (int topicId, int postId, int commentId, KasisDbContext dbContext) =>
+    {
+        var comment = await dbContext.Comments
+            .Include(c => c.Post)
+            .ThenInclude(p => p.Topic)
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.Post.Id == postId && c.Post.Topic.Id == topicId);
+
+        if (comment == null)
         {
-            var comment = await dbContext.Comments
-                .Include(comment => comment.Post)
-                .FirstOrDefaultAsync(comment => comment.Id == commentId && comment.Post.Id == postId && comment.Post.Topic.Id == topicId);
+            return Results.NotFound();
+        }
 
-            if (comment == null)
-            {
-                return Results.NotFound();
-            }
+        return Results.Ok(comment.ToDto());
+    });
 
-            if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
-                httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != comment.UserId)
-            {
-                return Results.Forbid();
-            }
+    // Update a comment
+    commentsGroups.MapPut("/comments/{commentId}", async (int topicId, int postId, int commentId, CreateOrUpdateCommentDto dto, KasisDbContext dbContext, HttpContext httpContext) =>
+    {
+        var comment = await dbContext.Comments
+            .Include(c => c.Post)
+            .ThenInclude(p => p.Topic)
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.Post.Id == postId && c.Post.Topic.Id == topicId);
 
-            comment.Content = dto.Content;
-            dbContext.Comments.Update(comment);
-            await dbContext.SaveChangesAsync();
-
-            return Results.Ok(comment.ToDto());
-        });
-
-        commentsGroups.MapDelete("/comments/{commentId}",[Authorize] async (int topicId, int postId, int commentId,HttpContext httpContext, KasisDbContext dbContext) =>
+        if (comment == null)
         {
-            var comment = await dbContext.Comments
-                .Include(comment => comment.Post)
-                .FirstOrDefaultAsync(comment => comment.Id == commentId && comment.Post.Id == postId && comment.Post.Topic.Id == topicId);
+            return Results.NotFound();
+        }
 
-            if (comment == null)
-            {
-                return Results.NotFound();
-            }
+        // Ensure the user is the one who created the comment, or is an admin
+        var userId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        if (comment.UserId != userId && !httpContext.User.IsInRole(ForumRoles.Admin))
+        {
+            return Results.Forbid(); // User cannot edit comment if not the creator or admin
+        }
 
-            if (!httpContext.User.IsInRole(ForumRoles.Admin) &&
-                httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != comment.UserId)
-            {
-                return Results.Forbid();
-            }
+        comment.Content = dto.Content;
+        dbContext.Comments.Update(comment);
+        await dbContext.SaveChangesAsync();
 
-            dbContext.Comments.Remove(comment);
-            await dbContext.SaveChangesAsync();
+        return Results.Ok(comment.ToDto());
+    });
 
-            return Results.NoContent();
-        });
-    }
+    // Delete a comment
+    commentsGroups.MapDelete("/comments/{commentId}", async (int topicId, int postId, int commentId, KasisDbContext dbContext, HttpContext httpContext) =>
+    {
+        var comment = await dbContext.Comments
+            .Include(c => c.Post)
+            .ThenInclude(p => p.Topic)
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.Post.Id == postId && c.Post.Topic.Id == topicId);
+
+        if (comment == null)
+        {
+            return Results.NotFound();
+        }
+
+        // Ensure the user is the one who created the comment, or is an admin
+        var userId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        if (comment.UserId != userId && !httpContext.User.IsInRole(ForumRoles.Admin))
+        {
+            return Results.Forbid(); // User cannot delete comment if not the creator or admin
+        }
+
+        dbContext.Comments.Remove(comment);
+        await dbContext.SaveChangesAsync();
+
+        return Results.NoContent();
+    });
+}
 }

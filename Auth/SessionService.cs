@@ -4,7 +4,7 @@ using KasisAPI.Helpers;
 
 namespace KasisAPI.Auth;
 
-public class SessionService(KasisDbContext dbContext)
+public class SessionService(ProjectDb dbContext)
 {
     public async Task CreateSessionAsync(Guid sessionId, string userId, string refreshToken, DateTime expiresAt)
     {
@@ -45,6 +45,6 @@ public class SessionService(KasisDbContext dbContext)
     {
         var session = await dbContext.Sessions.FindAsync(sessionId);
         return session is not null && session.ExpiresAt > DateTimeOffset.UtcNow && !session.IsRevoked &&
-            session.LastRefreshToken == refreshToken.ToSHA256();
+               session.LastRefreshToken == refreshToken.ToSHA256();
     }
 }

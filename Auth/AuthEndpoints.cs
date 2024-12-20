@@ -49,7 +49,7 @@ public static class AuthEndpoints
             var roles = await userManager.GetRolesAsync(user);
 
             var sessionId = Guid.NewGuid();
-            var expiresAt = DateTime.UtcNow.AddDays(2);
+            var expiresAt = DateTime.UtcNow.AddDays(3);
             var accessToken = jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
             var refreshToken = jwtTokenService.CreateRefreshToken(sessionId, user.Id, expiresAt);
 
@@ -68,7 +68,7 @@ public static class AuthEndpoints
             return Results.Ok(new SuccessfulLoginDto(accessToken));
         });
 
-        app.MapPost("api/accessToken", async (UserManager<ForumUser> userManager, JwtTokenService jwtTokenService,SessionService sessionService, HttpContext httpContext) =>
+        app.MapPost("api/accessToken", async (UserManager<ForumUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext) =>
         {
             if (!httpContext.Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
             {
@@ -101,7 +101,7 @@ public static class AuthEndpoints
             
             var roles = await userManager.GetRolesAsync(user);
 
-            var expiresAt = DateTime.UtcNow.AddDays(2);
+            var expiresAt = DateTime.UtcNow.AddDays(3);
             var accessToken = jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
             var newRefreshToken = jwtTokenService.CreateRefreshToken(sessionIdAsGuid, user.Id, expiresAt);
             
@@ -113,7 +113,7 @@ public static class AuthEndpoints
                 //Secure = false => should be true possibly
             };
             
-            httpContext.Response.Cookies.Append("RefreshToken", refreshToken, cookieOptions);
+            httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, cookieOptions);
 
             await sessionService.ExtendSessionAsync(sessionIdAsGuid, newRefreshToken, expiresAt);
             

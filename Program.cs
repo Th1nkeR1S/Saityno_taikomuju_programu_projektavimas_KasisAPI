@@ -84,25 +84,16 @@ public class Program
     static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
-        builder.Services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
-        });
-        });
-
         builder.Services.AddDbContext<KasisDbContext>();
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddFluentValidationAutoValidation(configuration =>
         {
             configuration.OverrideDefaultResultFactoryWith<ProblemDetailsResultFactory>();
         });
+        builder.Services.AddScoped<AuthSeeder>();
         builder.Services.AddTransient<JwtTokenService>();
         builder.Services.AddTransient<SessionService>();
-        builder.Services.AddScoped<AuthSeeder>();
-
+        
         builder.Services.AddIdentity<ForumUser, IdentityRole>()
             .AddEntityFrameworkStores<KasisDbContext>()
             .AddDefaultTokenProviders();
@@ -124,15 +115,20 @@ public class Program
 
         var app = builder.Build();
         using var scope = app.Services.CreateScope();
-        app.UseCors();
         var dbContext = scope.ServiceProvider.GetRequiredService<KasisDbContext>();
-       // dbContext.Database.Migrate();
+        dbContext.Database.Migrate();
 
         var dbSeeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
-            await dbSeeder.SeedAsync();   
+        await dbSeeder.SeedAsync();   
 
         app.AddAuthApi();
-
+        app.MapGet("api",(HttpContext httpContext, LinkGenerator linkGenerator)=> Results.Ok(new List<LinkDto>
+        {
+            new(linkGenerator.GetUriByName(httpContext, "GetTopics"), "movies", "GET"),
+        new(linkGenerator.GetUriByName(httpContext, "CreateTopics"), "createMovie", "POST"),
+        new(linkGenerator.GetUriByName(httpContext, "GetRoot"), "self", "GET"),
+        })).WithName("GetRoot");
+        
         app.AddTopicsApi();
         app.AddPostsApi();
         app.AddCommentsApi();

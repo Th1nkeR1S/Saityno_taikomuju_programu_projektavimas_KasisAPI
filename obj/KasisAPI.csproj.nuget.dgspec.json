@@ -1,32 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {}
+    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {}
   },
   "projects": {
-    "c:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {
+    "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
+        "projectUniqueName": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
         "projectName": "KasisAPI",
-        "projectPath": "c:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
+        "projectPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\KasisAPI.csproj",
         "packagesPath": "C:\\Users\\airid\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\obj\\",
+        "outputPath": "C:\\Users\\airid\\OneDrive\\Dokumenty\\GitHub\\Saityno_taikomuju_programu_projektavimas_KasisAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\airid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net9.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net9.0": {
+            "targetAlias": "net9.0",
             "projectReferences": {}
           }
         },
@@ -43,42 +43,52 @@
         "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net9.0": {
+          "targetAlias": "net9.0",
           "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.10.0, )"
+            },
             "FluentValidation.AspNetCore": {
               "target": "Package",
               "version": "[11.3.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[8.0.6, )"
+              "version": "[8.0.0, )"
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.2, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.2, )"
             },
-            "Microsoft.IdentityModel.JsonWebTokens": {
+            "Microsoft.EntityFrameworkCore.Relational": {
               "target": "Package",
-              "version": "[8.1.0, )"
+              "version": "[8.0.2, )"
             },
-            "Microsoft.IdentityModel.Tokens": {
+            "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.2, )"
             },
-            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.2, )"
             },
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
@@ -91,6 +101,10 @@
             "SharpGrip.FluentValidation.AutoValidation.Shared": {
               "target": "Package",
               "version": "[1.4.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.4.0, )"
             }
           },
           "imports": [
@@ -104,24 +118,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.11, 8.0.11]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.11, 8.0.11]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.11, 8.0.11]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.11, 8.0.11]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
