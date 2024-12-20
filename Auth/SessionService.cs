@@ -4,7 +4,7 @@ using KasisAPI.Helpers;
 
 namespace KasisAPI.Auth;
 
-public class SessionService(ProjectDb dbContext)
+public class SessionService(KasisDbContext dbContext)
 {
     public async Task CreateSessionAsync(Guid sessionId, string userId, string refreshToken, DateTime expiresAt)
     {
