@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const App = () => {
@@ -6,20 +6,30 @@ const App = () => {
 
   useEffect(() => {
     const loadTopics = async () => {
-      const response = await axios.get('http://localhost:5300/topics');
-      setTopics(response.data.resource);
+      try {
+        // Make sure your backend is running and the URL is correct
+        const response = await axios.get('http://localhost:5300/api/topics');
+        console.log(response.data.resource);
+        setTopics(response.data.resource);
+      } catch (error) {
+        console.error('Error fetching topics:', error);  // Log the error
+      }
     };
-    loadTopics();
 
+    loadTopics();
   }, []);
 
   return (
     <>
-    {topics.map((topic, i) => (
-      <p key = {i}> {topic.resource.title} {topic.resource.description}</p>
-    ))}
+      {topics.length === 0 ? (
+        <p>Loading topics...</p>
+      ) : (
+        topics.map((topic, i) => (
+          <p key={i}>{topic.title} {topic.description}</p>
+        ))
+      )}
     </>
-  )
+  );
 }
 
-  export default App;
+export default App;
